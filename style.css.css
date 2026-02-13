@@ -1,0 +1,174 @@
+body {
+    background:
+        linear-gradient(135deg, #0f1a33, #1a3a66, #f8fafc),
+        url("logo-videira.png");
+    background-repeat: no-repeat, repeat;
+    background-size: cover, 420px;
+    background-position: center, center;
+    background-attachment: fixed;
+    color: #ffffff;
+    font-family: 'Inter', sans-serif;
+    position: relative;
+}
+
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: url("logo-videira.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 35%;
+    opacity: 0.035;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.modal-anim {
+    animation: fadeIn 0.25s ease forwards;
+}
+
+.card-anim {
+    animation: slideUp 0.4s ease forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.max-w-7xl {
+    position: relative;
+    z-index: 2;
+    backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 24px;
+    padding: 16px;
+}
+
+header {
+    background: linear-gradient(90deg, #071a33, #0e3a66, #071a33);
+    border: 2px solid rgba(255,255,255,0.35);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.55);
+    position: relative;
+    padding-top: 95px;
+}
+
+header::before {
+    content: "";
+    position: absolute;
+    top: -55px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 120px;
+    background-image: url("image.jpeg");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: #ffffff;
+    border-radius: 50%;
+    border: 3px solid rgba(255,255,255,0.6);
+    box-shadow: 0 0 25px rgba(59,130,246,0.6);
+    animation: pulseGlow 3.5s infinite ease-in-out;
+    z-index: 5;
+}
+
+@keyframes pulseGlow {
+    0% {
+        transform: translateX(-50%) scale(1);
+        box-shadow: 0 0 18px rgba(59,130,246,0.4);
+    }
+    50% {
+        transform: translateX(-50%) scale(1.06);
+        box-shadow: 0 0 35px rgba(59,130,246,0.9);
+    }
+    100% {
+        transform: translateX(-50%) scale(1);
+        box-shadow: 0 0 18px rgba(59,130,246,0.4);
+    }
+}
+
+button {
+    font-family: 'Inter', sans-serif;
+    transition: all 0.25s ease;
+}
+
+.bg-blue-600 {
+    background: linear-gradient(135deg, #0a2240, #0e3a66);
+}
+
+.bg-blue-600:hover {
+    background: linear-gradient(135deg, #0c2a56, #144b80);
+    transform: translateY(-1px);
+}
+
+.bg-emerald-600 {
+    background: linear-gradient(135deg, #034e4a, #0f766e);
+}
+
+.bg-emerald-600:hover {
+    background: linear-gradient(135deg, #026457, #14b8a6);
+    transform: translateY(-1px);
+}
+
+.bg-red-600 {
+    background: linear-gradient(135deg, #8b0000, #b91c1c);
+}
+
+.bg-red-600:hover {
+    background: linear-gradient(135deg, #a30000, #dc2626);
+}
+
+#lista .bg-white\/5 {
+    background: rgba(255, 255, 255, 0.14);
+    border-left: 4px solid #1e40af;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.35);
+}
+
+#lista .bg-white\/5:hover {
+    transform: translateY(-4px);
+    background: rgba(255, 255, 255, 0.22);
+}
+
+
+input {
+    background: rgba(255,255,255,0.18) !important;
+    border: 1px solid rgba(255,255,255,0.45) !important;
+    color: #ffffff !important;
+    border-radius: 12px !important;
+}
+
+input::placeholder {
+    color: #e5e7eb !important;
+}
+
+@media (max-width: 768px) {
+    header {
+        padding-top: 85px;
+    }
+    header::before {
+        width: 90px;
+        height: 90px;
+        top: -45px;
+    }
+}
+

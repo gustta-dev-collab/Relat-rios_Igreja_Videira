@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema Relatório Videira</title>
+
+<script src="https://cdn.tailwindcss.com"></script> 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<link rel="stylesheet" href="style.css.css">
+<body class="min-h-screen bg-slate-900 text-white p-4 font-[Inter]">
+<div class="max-w-7xl mx-auto space-y-6">
+
+     <header class="flex flex-col md:flex-row justify-between items-center gap-4 p-6 bg-white/5 rounded-3xl">
+        <h1 class="text-2xl font-bold uppercase">Relatório de Células</h1>
+<div class="flex gap-3">
+<button onclick="toggle('modalGrafico')" class="bg-emerald-600 px-6 py-3 rounded-full text-xs font-bold uppercase">
+📊 Gráfico
+</button>
+<button onclick="toggle('modalForm')" class="bg-blue-600 px-6 py-3 rounded-full text-xs font-bold uppercase">
++ Novo Relatório
+</button>
+</div>
+</header>
+
+<div id="lista" class="grid md:grid-cols-2 gap-4"></div>
+</div>
+
+<!-- MODAL FORM -->
+<div id="modalForm" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4 z-50">
+<form id="form" class="bg-slate-800 p-6 rounded-3xl w-full max-w-lg space-y-3">
+<input required placeholder="Líder" id="lider" class="w-full p-3 rounded bg-slate-700">
+<input required placeholder="Pastor de Rede" id="pastorRede" class="w-full p-3 rounded bg-slate-700">
+<input required placeholder="Célula" id="celula" class="w-full p-3 rounded bg-slate-700">
+<input type="number" placeholder="Visitantes" id="visitantes" class="w-full p-3 rounded bg-slate-700">
+<input type="number" placeholder="Frequentadores Assíduos" id="frequentadores" class="w-full p-3 rounded bg-slate-700">
+<input type="number" placeholder="Membros" id="membros" class="w-full p-3 rounded bg-slate-700">
+<input type="number" placeholder="Oferta (R$)" id="oferta" class="w-full p-3 rounded bg-slate-700">
+
+<button class="w-full bg-blue-600 py-3 rounded font-bold">Salvar</button>
+<button 
+type="button" 
+onclick="toggle('modalForm')" 
+class="w-full bg-red-600 hover:bg-red-700
+transform hover:-translate-y-1 hover:shadow-xl
+active:translate-y-0 active:shadow-md
+transition-all duration-200
+py-3 rounded-xl font-semibold">
+Cancelar
+</button>
+</form>
+</div>
+
+<div id="modalDetalhes" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4 z-50">
+<div class="bg-slate-800 p-6 rounded-3xl w-full max-w-md space-y-3">
+<h2 class="text-xl font-bold">Detalhes do Relatório</h2>
+<div id="conteudoDetalhes" class="text-sm space-y-1"></div>
+<button onclick="toggle('modalDetalhes')" class="w-full bg-red-600 py-2 rounded">Fechar</button>
+</div>
+</div>
+
+<div id="modalGrafico" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4 z-50">
+<div class="bg-slate-800 p-6 rounded-3xl w-full max-w-3xl space-y-6">
+<canvas id="graficoResumo"></canvas>
+<button onclick="toggle('modalGrafico')" class="w-full bg-red-600 py-2 rounded">Fechar</button>
+</div>
+</div>
+
+<script>
+let dados = JSON.parse(localStorage.getItem('celulas')) || [];
+let graficoResumo;
+
+function toggle(id){
+document.getElementById(id).classList.toggle('hidden');
+}
+
+function salvar(){
+dados.push({
+id: Date.now(),
+lider: lider.value,
+pastorRede: pastorRede.value,
+celula: celula.value,
+visitantes: +visitantes.value || 0,
+frequentadores: +frequentadores.value || 0,
+membros: +membros.value || 0,
+oferta: +oferta.value || 0,
+data: new Date().toISOString().slice(0,10)
+});
+localStorage.setItem('celulas', JSON.stringify(dados));
+}
+
+function verDetalhes(id){
+const d = dados.find(x => x.id === id);
+conteudoDetalhes.innerHTML = `
+<p><b>Célula:</b> ${d.celula}</p>
+<p><b>Líder:</b> ${d.lider}</p>
+<p><b>Pastor de Rede:</b> ${d.pastorRede}</p>
+<p><b>Visitantes:</b> ${d.visitantes}</p>
+<p><b>Frequentadores:</b> ${d.frequentadores}</p>
+<p><b>Membros:</b> ${d.membros}</p>
+<p><b>Oferta:</b> R$ ${d.oferta}</p>
+<p><b>Data:</b> ${d.data}</p>
+`;
+toggle('modalDetalhes');
+}
+
+function apagar(id){
+if(!confirm('Deseja apagar este relatório?')) return;
+dados = dados.filter(d => d.id !== id);
+localStorage.setItem('celulas', JSON.stringify(dados));
+listar();
+gerarGrafico();
+}
+
+function listar(){
+lista.innerHTML = '';
+dados.forEach(d => {
+lista.innerHTML += `
+<div class="bg-white/5 p-4 rounded-xl relative space-y-2">
+<button onclick="apagar(${d.id})"
+class="absolute top-2 right-2 text-red-500 text-sm">🗑</button>
+
+<h3 class="font-bold">${d.celula}</h3>
+<p class="text-sm">Líder: ${d.lider}</p>
+<p class="text-sm">👥 ${d.visitantes + d.frequentadores + d.membros}</p>
+<p class="text-sm">💰 R$ ${d.oferta}</p>
+
+<button onclick="verDetalhes(${d.id})"
+class="bg-indigo-600 px-3 py-1 rounded text-xs font-bold">
+Ver detalhes
+</button>
+
+<p class="text-xs text-gray-400">${d.data}</p>
+</div>`;
+});
+}
+
+function gerarGrafico(){
+const total = dados.reduce((a,d)=>{
+a.visitantes += d.visitantes;
+a.frequentadores += d.frequentadores;
+a.membros += d.membros;
+return a;
+},{visitantes:0,frequentadores:0,membros:0});
+
+graficoResumo?.destroy();
+graficoResumo = new Chart(document.getElementById('graficoResumo'),{
+type:'bar',
+data:{
+labels:['Visitantes','Frequentadores','Membros'],
+datasets:[{
+label:'Total Geral',
+data:Object.values(total),
+borderRadius: 8
+}]
+},
+options:{
+responsive:true,
+plugins:{legend:{display:false}}
+}
+});
+}
+
+form.onsubmit = e => {
+e.preventDefault();
+salvar();
+listar();
+gerarGrafico();
+toggle('modalForm');
+form.reset();
+};
+
+listar();
+gerarGrafico();
+</script>
+<script src="main.js"></script>
+</body>
+</html>
+
+</body>
+</html>
